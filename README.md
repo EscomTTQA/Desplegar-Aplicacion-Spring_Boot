@@ -197,10 +197,11 @@ Al subirse por completo el archivo nos mostrará algo como lo siguiente:
 Ahora, ya sea desde la instancia en la interfaz de AWS o en la terminal de la máquina de Linux de AWS que abrimos con PuTTY podemos ejecutar el comando mencionado para hacer correr la aplicación Java. 
 
 ### Configuración del Usuario MySQL en la máquina de AWS
-Después de instalar y verificar el estado de MySQL, se realizó la configuración del usuario, primero ejecutar: 
+Después de instalar y verificar el estado de MySQL, se realizó la configuración del usuario. 
+Para obtener la contraseña temporal generada por MySQL. Primero ejecutar, 
 
 ```
-sudo grep 'temporary password' /var/log/mysqld.log para obtener la contraseña temporal generada por MySQL.
+sudo grep 'temporary password' /var/log/mysqld.log 
 ```
 
 Conectar a MySQL con el usuario root usando:
