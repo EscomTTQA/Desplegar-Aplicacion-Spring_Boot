@@ -63,6 +63,10 @@ sudo systemctl status mysqld
 1. **Descripción**: Verifica el estado del servicio de MySQL.
 2. **Propósito**: Asegurarse de que MySQL se ha iniciado correctamente y está en ejecución sin problemas.
 
+Hasta este punto se debería mostar algo como la siguiente imagen, el cual es el estatus del servicio de MySQL:
+
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/1752434c-a133-4c7c-99f5-a12c4e561280)
+
 ## Despliegue de la Aplicación Spring Boot
 Con la instancia configurada y MySQL en funcionamiento, se realizaron los siguientes pasos para desplegar la aplicación Spring Boot:
 
@@ -73,3 +77,29 @@ Con la instancia configurada y MySQL en funcionamiento, se realizaron los siguie
 ```sh
 java -jar nombre-de-la-aplicacion.jar
 ```
+
+### Transferencia del archivo JAR de la aplicación a la instancia EC2 mediante SSH.
+Hay varias formas de poder subir el archivo .jar, como lanzar una instancia de S3 bucket y sincronizarla con la instancia de EC2 a través de AWS-CLI. Tambien, se pueder lanzar una instancia de AWS Cloud9 conectada a VPC y luego escanearlos desde EC2. Sin embargo, la opción que se usa para este preoyecto es el uso de Secure Shell (SSH) para conectarse a su instancia de Linux desde una máquina local, pero hay que mencionar que es muy diferente los pasos a seguir para coneccarla dependiendo del sistema operativo de la máquina local.
+#### Conectarse a la instancia de Linux (AWS) desde Linux ó macOS (máquina local) usando SSH.
+Toda la siguiente información se detalla originalmente y de mejor forma en la [Documentación de AWS para conectar una máquina con SO de Linux o macOS a una instacia de Linux](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-ssh.html).
+1. En una ventana de terminal, usar el comando ssh para conectarse a la instancia.Especificar la ruta y el nombre de archivo de la clave privada (file.pem), este archivo se descarga en automatico cuando se crea la instancia de EC2 en AWS.
+
+```sh
+ssh -i /path/key-pair-name.pem instance-user-name@instance-public-dns-name
+```
+
+Se recibe una erspuesta como la siguiente:
+
+```sh
+No se puede establecer la autenticidad del host 'ec2-198-51-100-1.compute-1.amazonaws.com (198-51-100-1)'.
+La huella digital de la clave ECDSA es l4UB/neBad9tvkgJf1QZWxheQmR59WgrgzEimCG6kZY.
+¿Estás seguro de que quieres continuar conectándote (sí/no)?
+```
+
+2. Para transferir un archivo de la máquina local a la instacia de linux ejecutar lo siguiente:
+```sh
+scp -i /path/key-pair-name.pem /path/my-file.txt ec2-user@instance-public-dns-name:path/ 
+```
+
+#### Conectarse a la instancia de Linux (AWS) desde Windows (máquina local) usando SSH y PuTTY.
+Como se comentó anteriormente, los pasos a seguir para Windows son distintos que en otros sistemas operativos para conectar la máquina local con la instancia por medio de SSH. Para empezar se usa una aplicación llamada PuTTY que es un cliente SSH y SFTP para Windows. Está desarrollado y respaldado profesionalmente por Bitvise. Se puede encontar esta aplicación en [la págna oficial de PuTTY](https://www.putty.org/). 
