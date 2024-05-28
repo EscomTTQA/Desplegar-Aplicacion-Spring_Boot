@@ -5,7 +5,7 @@ Se describe el proceso de despliegue de una aplicación Spring Boot y una base d
 Antes del despliegue, se realizaron las siguientes configuraciones:
 
 ### Creación de la instancia EC2 utilizando la imagen de Amazon Linux 2023.
-Instalación de Java siguiendo las instrucciones oficiales de Amazon Corretto 17. [Documentación de instalación] (https://docs.aws.amazon.com/es_es/corretto/latest/corretto-17-ug/amazon-linux-install.html).
+Instalación de Java siguiendo las instrucciones oficiales de Amazon Corretto 17. [Documentación de instalación](https://docs.aws.amazon.com/es_es/corretto/latest/corretto-17-ug/amazon-linux-install.html).
 O simplemente, una vez coectado a la instancia de EC2 creada mediante la consola, ejecutar el siguiente comando:
 
 ```bash
