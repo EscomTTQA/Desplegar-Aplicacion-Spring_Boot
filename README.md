@@ -13,7 +13,20 @@ Se te mostrará una interfaz como la siguiente, donde podrás seleccionar distin
 
 Para poder desplegar la aplicación de Spring Boot se requiere la instalación de Java se siguen las instrucciones oficiales de Amazon Corretto 17. [Documentación de instalación](https://docs.aws.amazon.com/es_es/corretto/latest/corretto-17-ug/amazon-linux-install.html). Esto debido a que la aplicación desarrollada usa Java 17, sin embargo si el desarrollo de un proyecto Java se pudiera construir y empaquetar con la versión 11, en AWS hay imágenes de aplicaciones y sistemas operativos que ya tienen instalado lo necesario para ejecutar una aplicación como esta, por eso es importante la elección de la máquina de Amazon.  
 
-Una vez coectado a la instancia de EC2 creada mediante la consola, ejecutar el siguiente comando (tomado de la documentación antes mencionada):
+### Connfiguración de seguridad y tráfico de red de la instancia
+Cuando se cree la instancia en la interfaz de AWS podras ver el **resumen de instancia** en la parte donde termina la información general de la misma puedes encontrar este panel:
+
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/17492591-569a-4608-bf99-b8ce53a76116)
+
+Al dar clic en "Seguridad" observarás los detalles y la parte que es relevante para esta configuración es el grupo de seguridad, al dar clic sobre él se muestran detalles de este grupo como sus reglas de entrada y salida
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/227377f3-6cba-417c-a9d2-1d7daaa74180)
+
+Al presionar el botón de "Editar reglas de entrada" podemos cambiar las reglas para distinto tipo de tráfico de entrada, como el SSH, HTTPS o HTTP o puertos en especifico y las direcciones IP que permites que soliciten datos a la aplicación para cada tipo de tráfico.   
+
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/05775ccf-f441-4c38-9e95-04ea8a1b740e)
+
+### Configuración de la instancia AWS
+Una vez conectado a la instancia de EC2 creada mediante la consola, ejecutar el siguiente comando (tomado de la documentación antes mencionada):
 
 ```bash
 sudo yum install java-17-amazon-corretto-devel
@@ -67,6 +80,55 @@ Hasta este punto se debería mostar algo como la siguiente imagen, el cual es el
 
 ![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/1752434c-a133-4c7c-99f5-a12c4e561280)
 
+### Empaquetar aplicación de Java para crear .jar
+En una terminal navegar hasta la ruta del proyecto y colocarse en la raíz o donde se tenga el archivo pom y ejecutar el siguiente comando:
+
+```bash
+C:\Ruta\raiz\del\proyecto\donde\se\encuentra\el\pom\BecarIA_SpringBoot> ./mvnw clean package
+```
+
+Muestra las siguientes líneas de resultado:
+
+```bash
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------------< com.tt:becarIa >---------------------------
+[INFO] Building becarIa 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ becarIa ---
+[INFO] ...\BecarIA_SpringBoot\target
+[INFO]
+[INFO] --- resources:3.3.1:resources (default-resources) @ becarIa ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO]
+[INFO] --- compiler:3.11.0:compile (default-compile) @ becarIa ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 38 source files with javac [debug release 17] to target\classes
+[INFO] --- spring-boot:3.1.5:repackage (repackage) @ becarIa ---
+[INFO] Replacing main artifact C:\Ruta\raiz\del\proyecto\donde\se\encuentra\el\pom\BecarIA_SpringBoot\target\becarIa-0.0.1-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to C:\Ruta\raiz\del\proyecto\donde\se\encuentra\el\pom\BecarIA_SpringBoot\target\becarIa-0.0.1-SNAPSHOT.jar.original
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
+
+### Exportar e importar una base de datos de MySQL
+
+Se puede ejecutar el siguiente query para exportar una base de datos incluyendo toda su estructura (tablas, vistas, procedimientos almacenados, etc.) y todos sus registros usando:
+
+```sql
+mysqldump -u [usuario] -p [contraseña] [nombre_base_datos] > [nombre_archivo_dump].sql
+```
+
+De forma similar para importar una base de datos:
+
+```sql
+mysql -u [usuario] -p [contraseña] [nombre_base_datos] < [nombre_archivo_dump].sql
+```
+
 ## Despliegue de la Aplicación Spring Boot
 Con la instancia configurada y MySQL en funcionamiento, se realizaron los siguientes pasos para desplegar la aplicación Spring Boot:
 
@@ -102,4 +164,78 @@ scp -i /path/key-pair-name.pem /path/my-file.txt ec2-user@instance-public-dns-na
 ```
 
 #### Conectarse a la instancia de Linux (AWS) desde Windows (máquina local) usando SSH y PuTTY.
-Como se comentó anteriormente, los pasos a seguir para Windows son distintos que en otros sistemas operativos para conectar la máquina local con la instancia por medio de SSH. Para empezar se usa una aplicación llamada PuTTY que es un cliente SSH y SFTP para Windows. Está desarrollado y respaldado profesionalmente por Bitvise. Se puede encontar esta aplicación en [la págna oficial de PuTTY](https://www.putty.org/). 
+Como se comentó anteriormente, los pasos a seguir para Windows son distintos que en otros sistemas operativos para conectar la máquina local con la instancia por medio de SSH. Para empezar se usa una aplicación llamada PuTTY que es un cliente SSH y SFTP para Windows. Está desarrollado y respaldado profesionalmente por Bitvise. Se puede encontar esta aplicación en [la págna oficial de PuTTY](https://www.putty.org/). Igualmente, AWS detalla el proceso a seguir para [Conectarse a la instancia de Linux desde Windows con PuTTY](https://docs.aws.amazon.com/es_es/AWSEC2/latest/UserGuide/putty.html). 
+
+1. **Convertir la clave privada .pem a .ppk utilizando PuTTYgen**: Abrir la aplicación de PuTTYgen, en la sección de parámetros y tipo de clave a generar elegir RSA, luego cargar la imagen con de botón **load** elegir el archivo .pem (se descargó al crear la instancia AWS en automatico), por ultimo, guardar la llave privada **(Save private key)** que se genera con extensión .ppk con el mismo nombre que la llave original .pem:
+
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/f2620d12-cf8a-4182-ba70-97635ca6be3c)
+
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/950584e3-2659-45da-aab4-1c019e399002)
+
+2. **Conexión con la instancia de Linux**: Abrir PuTTY, en la primer pantalla que muestra, en el área de texto de "Host Name" colocar el nombre de usuario de la instancia (suele ser ec2-user) concatenado con @ y el DNS público (se obtiene en el resumen de la instancia EC2), poner el puerto **(port)** con el valor de 22 y que el tipo de conexión sea SSH, Luego, en el panel de categoría>Conexión>SSH>Autenticación>Credenciales y en **Archivo de clave privada para la autenticación** seleccionar la clave o llave .ppk pivada que se generó con PuTTYgen. Luego, dar en el botón **open**
+
+```sh
+instance-user-name
+```
+
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/f199a093-904b-48c2-86d2-6dc7cabe5642)
+
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/d2dfc56b-30e5-4a0f-8dfc-daf28096e06e)
+
+Si todo se hizo correctamente se abrira la siguiente ventana:
+
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/e91bcd9d-799c-4741-bf3e-1eab31085d6f)
+
+3. **Transferir archivos a la instancia de Linux mediante el cliente Secure Copy de PuTTY**: Abriendo una terminal o cmd en la máquina local y ejecutando el siguiente comando podremos transferir o cargar el archivo .jar o cualquier otro que sea necesario a la máquina de AWS:
+
+```sh
+pscp -i C:\path\my-key-pair.ppk C:\path\Sample_file.txt instance-user-name@instance-public-dns-name:/home/instance-user-name/Sample_file.txt
+```
+Al subirse por completo el archivo nos mostrará algo como lo siguiente:
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/36b72bad-d58b-4619-9fb1-6364cef2a9ed)
+
+Ahora, ya sea desde la instancia en la interfaz de AWS o en la terminal de la máquina de Linux de AWS que abrimos con PuTTY podemos ejecutar el comando mencionado para hacer correr la aplicación Java. 
+
+### Configuración del Usuario MySQL en la máquina de AWS
+Después de instalar y verificar el estado de MySQL, se realizó la configuración del usuario, primero ejecutar: 
+
+```
+sudo grep 'temporary password' /var/log/mysqld.log para obtener la contraseña temporal generada por MySQL.
+```
+
+Conectar a MySQL con el usuario root usando:
+
+```sh
+mysql -u root -p
+```
+
+Ingresar la contraseña temporal cuando se solicite. Cambiar la contraseña del usuario root:
+
+```sql
+ALTER USER 'root'@'localhost' IDENTIFIED BY '<Contraseña>';
+```
+
+Crear la base de datos becaria:
+
+```sql
+CREATE DATABASE becaria;
+```
+
+Crear un usuario dedicado para la base de datos becaria y otorgarle permisos:
+
+```sql
+CREATE USER 'becaria'@'localhost' IDENTIFIED BY 'contr4s3ña%%';
+GRANT ALL PRIVILEGES ON becaria.* TO 'becaria'@'localhost';
+USE becaria;
+```
+
+Salir de MySQL con Ctrl + D y probar la conexión con el nuevo usuario:
+
+Si todo funcina correctamente, entonces podemos exportar la base de datos en la máquina local, transferir este archivo mediante SSH a la máquina de AWS e importar la base de datos en la misma, todo se puede hacer con lo ya descrito anteriormente.
+
+### Probar aplicación en ejecución de Java y la base de datos mediante Postman:
+Usando una aplicación o herramienta que permita el manejo de APIs se pueden hacer peticiones al URL de la instancia, agregandole al DNS los endpoints o rutas hechos en la aplicación de Spring Boot:
+
+![image](https://github.com/EscomTTQA/Desplegar-Aplicacion-Spring_Boot/assets/167526018/1f009165-bb0e-4bb8-ad0c-0f0a2ccb3b12)
+
+Por razones de seguridad se oculta la URL completa de la aplicación, sin embargo podemos ver el resultado de obtener una petición GET a la tabla "interaccion" de niestra base de datos.
